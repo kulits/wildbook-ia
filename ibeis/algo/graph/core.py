@@ -1224,8 +1224,8 @@ class AnnotInference(ut.NiceRepr,
         infr.task_thresh_dict = {
             'zebra_grevys': {
                 'match_state': {
-                    POSTV: np.inf,  # GGR2 - 0.7732
-                    NEGTV: np.inf,  # GGR2 - 0.8605
+                    POSTV: 0.7312,  # GGR2 - 0.7732, Kaia CA - 0.7312
+                    NEGTV: 0.8892,  # GGR2 - 0.8605, Kaia CA - 0.8892
                     INCMP: np.inf,
                 },
                 'photobomb_state': {

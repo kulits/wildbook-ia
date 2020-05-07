@@ -4430,7 +4430,8 @@ def turk_identification_graph(graph_uuid=None, aid1=None, aid2=None,
             elif kaia:
                 print('[routes] Graph is in Kaia-mode')
                 query_config_dict = {
-                    'redun.enabled'   : False,
+                    'redun.enabled'      : False,
+                    'autoreview.enabled' : True,
                 }
             else:
                 print('[routes] Graph is not in hardcase-mode')

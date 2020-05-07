@@ -654,6 +654,8 @@ def localizer_parse_pred(ibs, test_gid_list=None, species_mapping={}, **kwargs):
 
 def localizer_precision_recall_algo(ibs, samples=SAMPLES, test_gid_list=None,
                                     **kwargs):
+    # ut.embed()
+
     if test_gid_list is None:
         test_gid_list = general_get_imageset_gids(ibs, 'TEST_SET', **kwargs)
 
@@ -2572,6 +2574,8 @@ def labeler_tp_tn_fp_fn(ibs, category_list, species_mapping={}, viewpoint_mappin
 
     value1_list = set(label_list)
     value2_list = set(probability_dict_list[0].keys())
+    print(value1_list)
+    print(value2_list)
     assert len(value1_list - value2_list) == 0
     assert len(value2_list - value1_list) == 0
 
