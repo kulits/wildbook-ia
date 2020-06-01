@@ -753,6 +753,24 @@ def query_chips_graph(ibs, qaid_list, daid_list, user_feedback=None,
             print('[WARNING] Shortened: %r' % (curvrank_daily_tag_, ))
             query_config_dict['curvrank_daily_tag'] = curvrank_daily_tag_
 
+    num_qaids = len(qaid_list)
+    num_daids = len(daid_list)
+
+    valid_aid_list = ibs.get_valid_aids()
+    qaid_list = list(set(qaid_list) & set(valid_aid_list))
+    daid_list = list(set(daid_list) & set(valid_aid_list))
+
+    num_qaids_ = len(qaid_list)
+    num_daids_ = len(daid_list)
+
+    if num_qaids != num_qaids_:
+        print('len(qaid_list)  = %d' % (num_qaids, ))
+        print('len(qaid_list_) = %d' % (num_qaids_, ))
+
+    if num_daids != num_daids_:
+        print('len(daid_list)  = %d' % (num_daids, ))
+        print('len(daid_list_) = %d' % (num_daids_, ))
+
     cm_list, qreq_ = ibs.query_chips(qaid_list=qaid_list, daid_list=daid_list,
                                      cfgdict=query_config_dict, return_request=True)
 
@@ -854,7 +872,7 @@ def query_chips_graph(ibs, qaid_list, daid_list, user_feedback=None,
                             view_orientation=view_orientation,
                             draw_matches=True,
                             draw_heatmask=False)
-                    except:
+                    except Exception:
                         filepath_matches = None
                         extern_flag = 'error'
                     try:
@@ -863,7 +881,7 @@ def query_chips_graph(ibs, qaid_list, daid_list, user_feedback=None,
                             view_orientation=view_orientation,
                             draw_matches=False,
                             draw_heatmask=True)
-                    except:
+                    except Exception:
                         filepath_heatmask = None
                         extern_flag = 'error'
                     try:
@@ -872,7 +890,7 @@ def query_chips_graph(ibs, qaid_list, daid_list, user_feedback=None,
                             view_orientation=view_orientation,
                             draw_matches=False,
                             draw_heatmask=False)
-                    except:
+                    except Exception:
                         filepath_clean = None
                         extern_flag = 'error'
 

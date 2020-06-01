@@ -29,9 +29,12 @@ ARCHIVE_URL_DICT = {
     'ryan_densenet_v2'          : 'https://wildbookiarepository.azureedge.net/models/classifier.cameratrap.ryan.densenet.v2.zip',
 
     'megan_argentina_v1'        : 'https://wildbookiarepository.azureedge.net/models/classifier.cameratrap.megan.argentina.densenet.v1.zip',
+
     'megan_kenya_v1'            : 'https://wildbookiarepository.azureedge.net/models/classifier.cameratrap.megan.kenya.densenet.v1.zip',
+    'megan_kenya_v2'            : 'https://wildbookiarepository.azureedge.net/models/classifier.cameratrap.megan.kenya.densenet.v2.zip',
 
     'zebra_v1'                  : 'https://wildbookiarepository.azureedge.net/models/labeler.zebra_grevys-zebra_plains.v1.zip',
+    'zebra_mountain_v0'         : 'https://wildbookiarepository.azureedge.net/models/labeler.zebra_mountain.v0.zip',
     'giraffe_v1'                : 'https://wildbookiarepository.azureedge.net/models/labeler.giraffe.v1.zip',
     'jaguar_v3'                 : 'https://wildbookiarepository.azureedge.net/models/labeler.jaguar.v3.zip',
     'lynx_v3'                   : 'https://wildbookiarepository.azureedge.net/models/labeler.lynx.v3.zip',
@@ -43,6 +46,16 @@ ARCHIVE_URL_DICT = {
     'spotted_skunk_v0'          : 'https://wildbookiarepository.azureedge.net/models/labeler.skunk_spotted.v0.zip',
 
     'humpback_dorsal'           : 'https://wildbookiarepository.azureedge.net/models/labeler.whale_humpback.dorsal.v0.zip',
+    'orca_v0'                   : 'https://wildbookiarepository.azureedge.net/models/labeler.whale_orca.v0.zip',
+    'fins_v0'                   : 'https://wildbookiarepository.azureedge.net/models/labeler.fins.v0.zip',
+
+    'wilddog_v0'                : 'https://wildbookiarepository.azureedge.net/models/labeler.wild_dog.v0.zip',
+    'wilddog_v1'                : 'https://wildbookiarepository.azureedge.net/models/labeler.wild_dog.v1.zip',
+    'wilddog_v2'                : 'https://wildbookiarepository.azureedge.net/models/labeler.wild_dog.v2.zip',
+    'wilddog_v3'                : 'https://wildbookiarepository.azureedge.net/models/labeler.wild_dog.v3.zip',
+
+    'leopard_v0'                : 'https://wildbookiarepository.azureedge.net/models/labeler.leopard.v0.zip',
+    'cheetah_v1'                : 'https://wildbookiarepository.azureedge.net/models/labeler.cheetah.v1.zip',
 
     'seadragon_v0'              : 'https://wildbookiarepository.azureedge.net/models/labeler.seadragon.v0.zip',
     'seadragon_v1'              : 'https://wildbookiarepository.azureedge.net/models/labeler.seadragon.v1.zip',

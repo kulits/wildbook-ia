@@ -236,9 +236,17 @@ def _compute_image_uuids(ibs, gpath_list, sanitize=True, ensure=True, **kwargs):
 
     # Create param_iter
     # params_list = list(preproc_image.add_images_params_gen(gpath_list))
-    params_list = list(ut.generate2(
-        preproc_image.parse_imageinfo, zip(gpath_list),
-        nTasks=len(gpath_list), force_serial=ibs.force_serial))
+    force_serial = ibs.force_serial or ibs.production
+    params_list = list(
+        ut.generate2(
+            preproc_image.parse_imageinfo,
+            list(zip(gpath_list)),
+            nTasks=len(gpath_list),
+            ordered=True,
+            force_serial=force_serial,
+            futures_threaded=True,
+        )
+    )
 
     # Error reporting
     failed_list = [
@@ -540,9 +548,18 @@ def localize_images(ibs, gid_list_=None):
                 uri_path = urlquote(uri_.path.encode('utf8'))
                 uri_ = uri_._replace(path=uri_path)
                 uri_ = uri_.geturl()
-                # six.moves.urllib.request.urlretrieve(uri_, filename=loc_gpath)
-                response = requests.get(uri_, stream=True, allow_redirects=True)
-                assert response.status_code == 200, '200 code not received on download'
+                try:
+                    # six.moves.urllib.request.urlretrieve(uri_, filename=temp_filepath)
+                    response = requests.get(uri_, stream=True, allow_redirects=True)
+                    assert response.status_code == 200, '200 code not received on download'
+                except Exception:
+                    scheme = urlsplit(uri_, allow_fragments=False).scheme
+                    uri_ = uri_.strip('%s://' % (scheme, ))
+                    uri_path = urlquote(uri_.encode('utf8'))
+                    uri_ = '%s://%s' % (scheme, uri_path, )
+                    # six.moves.urllib.request.urlretrieve(uri_, filename=temp_filepath)
+                    response = requests.get(uri_, stream=True, allow_redirects=True)
+                    assert response.status_code == 200, '200 code not received on download'
                 # Save
                 with open(loc_gpath, 'wb') as temp_file_:
                     for chunk in response.iter_content(1024):

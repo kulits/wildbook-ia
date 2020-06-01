@@ -40,12 +40,15 @@ CONFIG_URL_DICT = {
     'jaguar'                     : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.jaguar.v2.py',
 
     'giraffe_v1'                 : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.giraffe.v1.py',
+    'zebra_mountain_v0'          : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.zebra_mountain.v0.py',
 
     'hendrik_elephant'           : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.hendrik.elephant.py',
     'hendrik_elephant_ears'      : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.hendrik.elephant.ears.py',
     'hendrik_elephant_ears_left' : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.hendrik.elephant.ears.left.py',
     'hendrik_dorsal'             : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.hendrik.dorsal.py',
     'humpback_dorsal'            : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.whale_humpback.dorsal.v0.py',
+    'orca_v0'                    : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.whale_orca.v0.py',
+    'fins_v0'                    : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.fins.v0.py',
 
     'nassau_grouper_v0'          : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.grouper_nassau.v0.py',
     'spotted_dolphin_v0'         : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.dolphin_spotted.v0.py',
@@ -58,6 +61,9 @@ CONFIG_URL_DICT = {
     'seadragon_v1'               : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.seadragon.v1.py',
 
     'iot_v0'                     : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.iot.v0.py',
+    'wilddog_v0'                 : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.wild_dog.v0.py',
+    'leopard_v0'                 : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.leopard.v0.py',
+    'cheetah_v1'                 : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.cheetah.v1.py',
 
     'kitsci_v0'                  : 'https://wildbookiarepository.azureedge.net/models/detect.lightnet.kitsci.v0.py',
 

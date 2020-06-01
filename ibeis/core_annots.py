@@ -555,7 +555,7 @@ class AnnotMaskConfig(dtool.Config):
     colnames=['img', 'width', 'height'],
     coltypes=[('extern', vt.imread), int, int],
     configclass=AnnotMaskConfig,
-    fname='../maskcache2',
+    fname='maskcache2',
     # isinteractive=True,
 )
 def compute_annotmask(depc, aid_list, config=None):
@@ -1136,8 +1136,12 @@ def compute_feats(depc, cid_list, config=None):
         # TODO: Check if there is any benefit to just passing in the iterator.
         arg_list = list(arg_iter)
         featgen = ut.generate2(
-            gen_feat_worker, arg_list, nTasks=nInput, ordered=True,
-            force_serial=ibs.force_serial, progkw={'freq': 1},
+            gen_feat_worker,
+            arg_list,
+            nTasks=nInput,
+            ordered=True,
+            force_serial=ibs.force_serial,
+            progkw={'freq': 1},
             futures_threaded=True,
         )
     elif feat_type == 'hesaff+siam128':
@@ -1225,7 +1229,7 @@ class FeatWeightConfig(dtool.Config):
     coltypes=[np.ndarray],
     configclass=FeatWeightConfig,
     rm_extern_on_delete=True,
-    fname='featcache', chunksize=64 if const.PRODUCTION else 512,
+    fname='featcache', chunksize=64 if const.CONTAINERIZED else 512,
 )
 def compute_fgweights(depc, fid_list, pcid_list, config=None):
     """
@@ -1261,7 +1265,10 @@ def compute_fgweights(depc, fid_list, pcid_list, config=None):
     # Force grayscale reading of chips
     arg_iter = zip(kpts_list, probchip_list, chipsize_list)
     featweight_gen = ut.generate2(
-        gen_featweight_worker, arg_iter, nTasks=nTasks, ordered=True,
+        gen_featweight_worker,
+        arg_iter,
+        nTasks=nTasks,
+        ordered=True,
         force_serial=ibs.force_serial,
         progkw={'freq': 1},
         futures_threaded=True,
@@ -1698,7 +1705,7 @@ class ClassifierConfig(dtool.Config):
     coltypes=[float, str],
     configclass=ClassifierConfig,
     fname='chipcache4',
-    chunksize=32 if const.PRODUCTION else 1024,
+    chunksize=32 if const.CONTAINERIZED else 1024,
 )
 def compute_classifications(depc, aid_list, config=None):
     r"""
@@ -1771,7 +1778,7 @@ class CanonicalConfig(dtool.Config):
     coltypes=[float, float, float, float],
     configclass=CanonicalConfig,
     fname='canonicalcache4',
-    chunksize=32 if const.PRODUCTION else 1024,
+    chunksize=32 if const.CONTAINERIZED else 1024,
 )
 def compute_canonical(depc, aid_list, config=None):
     r"""
@@ -1836,7 +1843,7 @@ class LabelerConfig(dtool.Config):
     coltypes=[float, str, str, str, float, dict],
     configclass=LabelerConfig,
     fname='chipcache4',
-    chunksize=8 if const.PRODUCTION else 128,
+    chunksize=8 if const.CONTAINERIZED else 128,
 )
 def compute_labels_annotations(depc, aid_list, config=None):
     r"""
@@ -1852,8 +1859,10 @@ def compute_labels_annotations(depc, aid_list, config=None):
 
     CommandLine:
         python -m ibeis.core_annots --exec-compute_labels_annotations
+        python -m ibeis.core_annots --exec-compute_labels_annotations:0
+        python -m ibeis.core_annots --exec-compute_labels_annotations:1
 
-    Example:
+    Example0:
         >>> # DISABLE_DOCTEST
         >>> from ibeis.core_images import *  # NOQA
         >>> import ibeis
@@ -1875,6 +1884,19 @@ def compute_labels_annotations(depc, aid_list, config=None):
         >>> print(results)
         >>> # depc.delete_property('labeler', aid_list)
         >>> results = depc.get_property('labeler', aid_list, None)
+        >>> print(results)
+
+    Example1:
+        >>> # DISABLE_DOCTEST
+        >>> from ibeis.core_images import *  # NOQA
+        >>> import ibeis
+        >>> defaultdb = 'WD_Master'
+        >>> ibs = ibeis.opendb(defaultdb=defaultdb)
+        >>> depc = ibs.depc_annot
+        >>> aid_list = ibs.get_valid_aids()[0:8]
+        >>> config = {'labeler_algo': 'densenet', 'labeler_weight_filepath': 'wilddog_v3,wilddog_v2,wilddog_v1'}
+        >>> # depc.delete_property('labeler', aid_list)
+        >>> results = depc.get_property('labeler', aid_list, None, config=config)
         >>> print(results)
     """
     print('[ibs] Process Annotation Labels')
@@ -1898,16 +1920,82 @@ def compute_labels_annotations(depc, aid_list, config=None):
         result_gen = azure.label_aid_list(ibs, aid_list, **config)
     elif config['labeler_algo'] in ['densenet']:
         from ibeis.algo.detect import densenet
-        config_ = {
-            'dim_size': (densenet.INPUT_SIZE, densenet.INPUT_SIZE),
-            'resize_dim': 'wh',
-            'axis_aligned': config['labeler_axis_aligned'],
-        }
-        chip_filepath_list = depc.get_property('chips', aid_list, 'img', config=config_,
-                                               read_extern=False, ensure=True)
-        config = dict(config)
-        config['classifier_weight_filepath'] = config['labeler_weight_filepath']
-        result_gen = densenet.test_dict(chip_filepath_list, return_dict=True, **config)
+        if ',' not in config['labeler_weight_filepath']:
+            config_ = {
+                'dim_size': (densenet.INPUT_SIZE, densenet.INPUT_SIZE),
+                'resize_dim': 'wh',
+                'axis_aligned': config['labeler_axis_aligned'],
+            }
+            chip_filepath_list = depc.get_property('chips', aid_list, 'img', config=config_,
+                                                   read_extern=False, ensure=True)
+            config = dict(config)
+            config['classifier_weight_filepath'] = config['labeler_weight_filepath']
+            result_gen = densenet.test_dict(chip_filepath_list, return_dict=True, **config)
+        else:
+            labeler_weight_filepath = config['labeler_weight_filepath']
+            labeler_weight_filepath = labeler_weight_filepath.strip()
+
+            if labeler_weight_filepath in ['wilddog_v3,wilddog_v2,wilddog_v1']:
+                labeler_weight_filepath_list = labeler_weight_filepath.split(',')
+
+                results_dict = {}
+                for labeler_weight_filepath_ in labeler_weight_filepath_list:
+                    labeler_weight_filepath_ = labeler_weight_filepath_.strip()
+
+                    config_ = dict(config)
+                    config_['labeler_weight_filepath'] = labeler_weight_filepath_
+                    config_.pop('chip_cfg')
+                    results = depc.get_property('labeler', aid_list, None, config=config_)
+                    results_dict[labeler_weight_filepath_] = results
+
+                results_list = ut.take(results_dict, labeler_weight_filepath_list)
+                results_list = list(zip(*results_list))
+
+                result_gen = []
+                for results in results_list:
+                    results_ = dict(zip(labeler_weight_filepath_list, results))
+
+                    result1 = results_.get('wilddog_v1', None)
+                    result2 = results_.get('wilddog_v2', None)
+                    result3 = results_.get('wilddog_v3', None)
+                    assert None not in [result1, result2, result3]
+
+                    flag1 = result1[1] in ['wild_dog_dark', 'wild_dog_general', 'wild_dog_puppy', 'wild_dog_standard', 'wild_dog_tan']
+                    flag2 = result2[1] in ['wild_dog', 'wild_dog_puppy']
+                    flag3 = result3[1] in ['wild_dog']
+
+                    score = np.mean(( result1[0], result2[0], result3[0], ))
+
+                    if flag3:
+                        if flag1 and flag2:
+                            # Body
+                            species = result1[1]
+                            viewpoint = result2[2]
+                        else:
+                            # Body Ambiguous
+                            species = 'wild_dog_ambiguous'
+                            viewpoint = 'ambiguous'
+                    else:
+                        if not flag1 and not flag2:
+                            # Tail
+                            species = result3[1]
+                            viewpoint = 'ignore'
+                        else:
+                            # Tail Ambiguous
+                            species = 'wild_dog+tail_ambiguous'
+                            viewpoint = 'ambiguous'
+
+                    quality = 'UNKNOWN'
+                    orientation = 0.0
+                    prob_key = '%s:%s' % (species, viewpoint, )
+                    probs = {}
+                    probs[prob_key] = score
+                    if score < 1.0:
+                        probs['other'] = 1.0 - score
+                    result = (score, species, viewpoint, quality, orientation, probs, )
+                    result_gen.append(result)
+            else:
+                raise NotImplementedError('Muti-tier labeler config not supported')
     else:
         raise ValueError('specified labeler algo is not supported in config = %r' % (config, ))
 
@@ -1928,7 +2016,7 @@ class AoIConfig(dtool.Config):
     coltypes=[float, str],
     configclass=AoIConfig,
     fname='chipcache4',
-    chunksize=32 if const.PRODUCTION else 256,
+    chunksize=32 if const.CONTAINERIZED else 256,
 )
 def compute_aoi2(depc, aid_list, config=None):
     r"""
@@ -1992,7 +2080,7 @@ class OrienterConfig(dtool.Config):
     coltypes=[float, float, float, float, float],
     configclass=OrienterConfig,
     fname='detectcache',
-    chunksize=8 if const.PRODUCTION else 128,
+    chunksize=8 if const.CONTAINERIZED else 128,
 )
 def compute_orients_annotations(depc, aid_list, config=None):
     r"""
@@ -2063,7 +2151,7 @@ def compute_orients_annotations(depc, aid_list, config=None):
 
                 result = (xtl, ytl, w, h, theta, )
                 result_gen.append(result)
-        except:
+        except Exception:
             raise RuntimeError('Deepsense orienter not working!')
     else:
         raise ValueError('specified orienter algo is not supported in config = %r' % (config, ))
