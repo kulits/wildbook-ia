@@ -614,9 +614,9 @@ def crossval_helper(nid_to_sample_pool, perquery, perdatab, n_need,
         import scipy
         poolsize = len(pool)
         # Number of ways we can select queries
-        n_qmax = int(scipy.misc.comb(poolsize, perquery))
+        n_qmax = int(scipy.special.comb(poolsize, perquery))
         # Number of ways we can select targets from remaining items
-        n_dmax = int(scipy.misc.comb(poolsize - perquery, perdatab))
+        n_dmax = int(scipy.special.comb(poolsize - perquery, perdatab))
         # Total number of query / data combinations
         n_combos = n_qmax * n_dmax
 
