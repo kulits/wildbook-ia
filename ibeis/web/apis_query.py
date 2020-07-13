@@ -771,6 +771,12 @@ def query_chips_graph(ibs, qaid_list, daid_list, user_feedback=None,
         print('len(daid_list)  = %d' % (num_daids, ))
         print('len(daid_list_) = %d' % (num_daids_, ))
 
+    if num_qaids_ == 0:
+        raise ValueError('There are 0 valid query aids, %d were provided' % (num_qaids, ))
+
+    if num_daids_ == 0:
+        raise ValueError('There are 0 valid database aids, %d were provided' % (num_daids, ))
+
     cm_list, qreq_ = ibs.query_chips(qaid_list=qaid_list, daid_list=daid_list,
                                      cfgdict=query_config_dict, return_request=True)
 
@@ -1776,7 +1782,7 @@ def query_graph_v2_latest_logs(future):
         print('--- <LOG DUMP> ---')
         for msg, color in logs:
             ut.cprint('[web.infr] ' + msg, color)
-        print('--- <\LOG DUMP> ---')
+        print('--- <\\LOG DUMP> ---')
 
 
 def query_graph_v2_on_request_review(future):
