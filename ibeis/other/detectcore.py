@@ -268,6 +268,7 @@ def export_to_coco(ibs, species_list, species_mapping={}, viewpoint_mapping={},
                    use_existing_train_test=True, include_parts=False, gid_list=None,
                    include_reviews=True, require_image_reviewed=False,
                    require_named=False, output_images=True, **kwargs):
+
     """Create training COCO dataset for training models."""
     from datetime import date
     import datetime
@@ -305,7 +306,7 @@ def export_to_coco(ibs, species_list, species_mapping={}, viewpoint_mapping={},
         'url'          : 'http://www.wildme.org',
         'version'      : '1.0',
         'year'         : current_year,
-        'contributor'  : 'Wild Me, Jason Parham <parham@wildme.org>',
+        'contributor'  : 'Wild Me <dev@wildme.org>',
         'date_created' : datetime.datetime.utcnow().isoformat(' '),
         'name'         : ibs.get_db_name(),
         'uuid'         : str(ibs.get_db_init_uuid()),
@@ -376,7 +377,7 @@ def export_to_coco(ibs, species_list, species_mapping={}, viewpoint_mapping={},
             'image_id'          : image_index,
             'category_id'       : category_dict[species_name],
             'uuid'              : str(part_uuid if is_part else annot_uuid),
-            # 'individual_ids'    : individuals,
+            'individual_ids'    : individuals,
         }
         if is_part:
             annot_part['annot_id']   = annot_index
@@ -477,14 +478,25 @@ def export_to_coco(ibs, species_list, species_mapping={}, viewpoint_mapping={},
             _image = vt.resize(_image, (width, height))
             vt.imwrite(image_filepath, _image)
 
+        image_gps = ibs.get_image_gps(gid)
+        if image_gps is None or len(image_gps) != 2 or None in image_gps:
+            image_gps_lat, image_gps_lon = None
+        else:
+            image_gps_lat, image_gps_lon = image_gps
+            image_gps_lat = '%03.06f' % (image_gps_lat, )
+            image_gps_lon = '%03.06f' % (image_gps_lon, )
+
         output_dict[dataset]['images'].append({
             'license'       : 3,
             'file_name'     : image_filename,
             # 'file_name'     : basename(ibs.get_image_uris_original(gid)),
+            'photographer'  : ibs.get_image_notes(gid),
             'coco_url'      : None,
             'height'        : height,
             'width'         : width,
             'date_captured' : ibs.get_image_datetime_str(gid).replace('/', '-'),
+            'gps_lat_captured' : image_gps_lat,
+            'gps_lon_captured' : image_gps_lon,
             'flickr_url'    : None,
             'id'            : image_index,
             'uuid'          : str(ibs.get_image_uuids(gid)),
@@ -528,7 +540,7 @@ def export_to_coco(ibs, species_list, species_mapping={}, viewpoint_mapping={},
             print('\t\tAdding annot %r with area %0.04f pixels^2' % (species_name, area, ))
 
             if include_reviews:
-                # individuals = ibs.get_name_aids(ibs.get_annot_nids(aid))
+                individuals = ibs.get_name_aids(ibs.get_annot_nids(aid))
                 reviews = ibs.get_review_rowids_from_single([aid])[0]
                 user_list = ibs.get_review_identity(reviews)
                 aid_tuple_list = ibs.get_review_aid_tuple(reviews)
@@ -587,14 +599,14 @@ def export_to_coco(ibs, species_list, species_mapping={}, viewpoint_mapping={},
             annot = annots[index]
 
             # Map internal aids to external annot index
-            # individual_ids = annot['individual_ids']
-            # individual_ids_ = []
-            # for individual_id in individual_ids:
-            #     if individual_id not in aid_dict:
-            #         continue
-            #     individual_id_ = aid_dict[individual_id]
-            #     individual_ids_.append(individual_id_)
-            # annot['individual_ids'] = individual_ids_
+            individual_ids = annot['individual_ids']
+            individual_ids_ = []
+            for individual_id in individual_ids:
+                if individual_id not in aid_dict:
+                    continue
+                individual_id_ = aid_dict[individual_id]
+                individual_ids_.append(individual_id_)
+            annot['individual_ids'] = individual_ids_
 
             # Map reviews
             if include_reviews:
