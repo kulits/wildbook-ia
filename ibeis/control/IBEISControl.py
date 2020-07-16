@@ -127,6 +127,11 @@ if ut.get_argflag('--orient2d'):
         (('--no-2d-orient', '--no2dorient'), 'ibeis_2d_orientation._plugin'),
     ]
 
+if ut.get_argflag('--pie'):
+    AUTOLOAD_PLUGIN_MODNAMES += [
+        (('--no-pie', '--nopie'), 'wbia_pie._plugin'),
+    ]
+
 
 """
 # Should import
