@@ -33,6 +33,8 @@ ARCHIVE_URL_DICT = {
     'megan_kenya_v1'            : 'https://wildbookiarepository.azureedge.net/models/classifier.cameratrap.megan.kenya.densenet.v1.zip',
     'megan_kenya_v2'            : 'https://wildbookiarepository.azureedge.net/models/classifier.cameratrap.megan.kenya.densenet.v2.zip',
 
+    'laterals_v0'               : 'https://wildbookiarepository.azureedge.net/models/classifier.cameratrap.laterals.densenet.v0.zip',
+
     'zebra_v1'                  : 'https://wildbookiarepository.azureedge.net/models/labeler.zebra_grevys-zebra_plains.v1.zip',
     'zebra_mountain_v0'         : 'https://wildbookiarepository.azureedge.net/models/labeler.zebra_mountain.v0.zip',
     'giraffe_v1'                : 'https://wildbookiarepository.azureedge.net/models/labeler.giraffe.v1.zip',
@@ -408,7 +410,7 @@ def visualize_augmentations(dataset, augmentation, tag, num_per_class=10, **kwar
     plt.imsave(canvas_filepath, canvas)
 
 
-def train(data_path, output_path, batch_size=48, class_weights={}, multi=PARALLEL, sample_multiplier=4.0, **kwargs):
+def train(data_path, output_path, batch_size=48, class_weights={}, multi=PARALLEL, sample_multiplier=8.0, **kwargs):
     # Detect if we have a GPU available
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     using_gpu = str(device) != 'cpu'
