@@ -267,7 +267,8 @@ def export_to_coco(ibs, species_list, species_mapping={}, viewpoint_mapping={},
                    target_size=2400, use_maximum_linear_dimension=True,
                    use_existing_train_test=True, include_parts=False, gid_list=None,
                    include_reviews=True, require_image_reviewed=False,
-                   require_named=False, output_images=True, **kwargs):
+                   require_named=False, output_images=True, use_global_train_set=False,
+                   **kwargs):
 
     """Create training COCO dataset for training models."""
     from datetime import date
@@ -440,18 +441,21 @@ def export_to_coco(ibs, species_list, species_mapping={}, viewpoint_mapping={},
     print('Exporting %d images' % (len(gid_list),))
     for gid in gid_list:
 
-        if gid in test_gid_set:
-            dataset = 'test'
-        elif gid in train_gid_set:
-            state = random.uniform(0.0, 1.0)
-            if state <= 0.75:
-                dataset = 'train'
-            else:
-                dataset = 'val'
+        if use_global_train_set:
+            dataset = 'train'
         else:
-            # raise AssertionError('All gids must be either in the TRAIN_SET or TEST_SET imagesets')
-            print('GID = %r was not in the TRAIN_SET or TEST_SET' % (gid, ))
-            dataset = 'test'
+            if gid in test_gid_set:
+                dataset = 'test'
+            elif gid in train_gid_set:
+                state = random.uniform(0.0, 1.0)
+                if state <= 0.75:
+                    dataset = 'train'
+                else:
+                    dataset = 'val'
+            else:
+                # raise AssertionError('All gids must be either in the TRAIN_SET or TEST_SET imagesets')
+                print('GID = %r was not in the TRAIN_SET or TEST_SET' % (gid, ))
+                dataset = 'test'
 
         width, height = ibs.get_image_sizes(gid)
         if target_size is None:
